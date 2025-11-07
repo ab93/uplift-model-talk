@@ -2,8 +2,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import sem
-from sklift.metrics import qini_curve, perfect_qini_curve, qini_auc_score, uplift_curve, perfect_uplift_curve, \
-    uplift_auc_score
+from sklift.metrics import (
+    qini_curve,
+    perfect_qini_curve,
+    qini_auc_score,
+    uplift_curve,
+    perfect_uplift_curve,
+    uplift_auc_score,
+)
 
 
 class UpliftCurveDisplay:
@@ -18,9 +24,18 @@ class UpliftCurveDisplay:
         estimator_name (str): Name of estimator. If None, the estimator name is not shown.
     """
 
-    def __init__(self, x_actual, y_actual, x_baseline=None,
-                 y_baseline=None, x_perfect=None, y_perfect=None,
-                 random=None, perfect=None, estimator_name=None):
+    def __init__(
+        self,
+        x_actual,
+        y_actual,
+        x_baseline=None,
+        y_baseline=None,
+        x_perfect=None,
+        y_perfect=None,
+        random=None,
+        perfect=None,
+        estimator_name=None,
+    ):
         self.x_actual = x_actual
         self.y_actual = y_actual
         self.x_baseline = x_baseline
@@ -59,7 +74,7 @@ class UpliftCurveDisplay:
         if ax is None:
             fig, ax = plt.subplots()
 
-        self.line_, = ax.plot(self.x_actual, self.y_actual, **line_kwargs)
+        (self.line_,) = ax.plot(self.x_actual, self.y_actual, **line_kwargs)
 
         if self.random:
             ax.plot(self.x_baseline, self.y_baseline, label="Random")
@@ -68,8 +83,8 @@ class UpliftCurveDisplay:
         if self.perfect:
             ax.plot(self.x_perfect, self.y_perfect, label="Perfect")
 
-        ax.set_xlabel('Number targeted')
-        ax.set_ylabel('Number of incremental outcome')
+        ax.set_xlabel("Number targeted")
+        ax.set_ylabel("Number of incremental outcome")
 
         if self.random == self.perfect:
             variance = False
@@ -82,7 +97,7 @@ class UpliftCurveDisplay:
                 ax.lines.pop(len(ax.lines) - 1)
 
         if "label" in line_kwargs:
-            ax.legend(loc=u'upper left', bbox_to_anchor=(1, 1))
+            ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
 
         self.ax_ = ax
         self.figure_ = ax.figure
@@ -90,8 +105,17 @@ class UpliftCurveDisplay:
         return self
 
 
-def plot_qini_curve(y_true, uplift, treatment,
-                    random=True, perfect=True, negative_effect=True, ax=None, name=None, **kwargs):
+def plot_qini_curve(
+    y_true,
+    uplift,
+    treatment,
+    random=True,
+    perfect=True,
+    negative_effect=True,
+    ax=None,
+    name=None,
+    **kwargs,
+):
     """Plot Qini curves from predictions.
 
     Args:
@@ -131,8 +155,7 @@ def plot_qini_curve(y_true, uplift, treatment,
         x_baseline, y_baseline = None, None
 
     if perfect:
-        x_perfect, y_perfect = perfect_qini_curve(
-            y_true, treatment, negative_effect)
+        x_perfect, y_perfect = perfect_qini_curve(y_true, treatment, negative_effect)
     else:
         x_perfect, y_perfect = None, None
 
@@ -153,8 +176,9 @@ def plot_qini_curve(y_true, uplift, treatment,
     return viz.plot(auc, ax=ax, title="AUC", **kwargs)
 
 
-def plot_uplift_curve(y_true, uplift, treatment,
-                      random=True, perfect=True, ax=None, name=None, **kwargs):
+def plot_uplift_curve(
+    y_true, uplift, treatment, random=True, perfect=True, ax=None, name=None, **kwargs
+):
     """Plot Uplift curves from predictions.
 
     Args:
@@ -263,9 +287,15 @@ def plot_uplift_bins(
         .agg(mean="mean", sem=lambda x: sem(x, nan_policy="omit"), count="count")
         .reset_index()
     )
-    bin_df = grouped.pivot(index="bin", columns="t", values=["mean", "sem"]).sort_index().astype(np.float32)
+    bin_df = (
+        grouped.pivot(index="bin", columns="t", values=["mean", "sem"])
+        .sort_index()
+        .astype(np.float32)
+    )
 
-    bin_df[("mean", "actual_uplift")] = bin_df["mean"]["treatment"] - bin_df["mean"]["control"]
+    bin_df[("mean", "actual_uplift")] = (
+        bin_df["mean"]["treatment"] - bin_df["mean"]["control"]
+    )
     bin_df[("sem", "actual_uplift")] = np.sqrt(
         bin_df["sem"]["treatment"] ** 2 + bin_df["sem"]["control"] ** 2
     )
