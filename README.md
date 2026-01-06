@@ -33,7 +33,7 @@ Usage examples
 - Import helpers from `src` in your own scripts or notebooks:
 
 ```python
-from src.bins import plot_uplift_bins  # replace with actual function names
+from src.bins import plot_uplift_bins
 from src.curve import plot_qini_curve
 ```
 
